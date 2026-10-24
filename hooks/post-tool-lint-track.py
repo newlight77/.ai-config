@@ -43,9 +43,9 @@ def main() -> None:
         json.dump({}, sys.stdout)
         return
 
-    skill = _STACK_SKILL.get(target.stack, ".ai-config/skills/kapita-skills.md")
+    skill = _STACK_SKILL.get(target.stack, ".ai-config/skills/generic-skills.md")
     msg = (
-        f"Kapita {target.stack} lint: you edited code under `{target.package}`. "
+        f"{target.stack.capitalize()} lint: you edited code under `{target.package}`. "
         f"Before finishing this task, run `{target.cmd}` and fix all reported errors "
         f"(see {skill}). The stop hook lists every package touched this session."
     )

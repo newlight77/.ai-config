@@ -9,8 +9,10 @@ a different output shape: `{"hookSpecificOutput": {"hookEventName": ...,
 
 Rather than duplicate every script's logic for each tool's contract, this
 adapter runs the given script unchanged (same stdin, same working
-directory) and re-wraps whatever Cursor-shaped JSON it prints into the
-shape Claude Code understands. Usage (from `.claude/settings.json`):
+directory: the session's project directory, which is not necessarily the
+repository that holds the hooks) and re-wraps whatever Cursor-shaped JSON it
+prints into the shape Claude Code understands. Usage (from
+`.claude/settings.json`, script path relative to the project directory):
 
     python3 .ai-config/hooks/claude_output_adapter.py .ai-config/hooks/<script>.py
 """
@@ -19,7 +21,6 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
-from pathlib import Path
 
 
 def main() -> None:
@@ -43,7 +44,6 @@ def main() -> None:
         input=raw_stdin,
         capture_output=True,
         text=True,
-        cwd=Path(__file__).resolve().parents[2],
     )
 
     try:

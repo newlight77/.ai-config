@@ -62,7 +62,7 @@ def main() -> None:
     lines.extend(
         [
             "",
-            "Policy: `.ai-config/rules/kapita-rules.md` (lint before finish). "
+            "Policy: `.ai-config/rules/generic-rules.md` (lint before finish). "
             f"Backend: {_STACK_SKILL['backend']}. "
             f"Web: {_STACK_SKILL['web']}. "
             f"Mobile: {_STACK_SKILL['mobile']}.",

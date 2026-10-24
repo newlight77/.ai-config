@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 STATE_FILE = Path(__file__).resolve().parent / ".code-lint-state.json"
 
@@ -36,24 +36,40 @@ def _monorepo_package(parts: list[str]) -> str | None:
     return None
 
 
-def resolve_backend_lint_target(path: str) -> LintTarget | None:
-    norm = path.replace("\\", "/")
-    if not norm.startswith("backend/") or not norm.endswith(".py"):
+def _first_target(
+    path: str, root: str, build: Callable[[str, str], "LintTarget | None"]
+) -> "LintTarget | None":
+    """Build a target for the first `root` segment of `path` that yields one.
+
+    `prefix` is what precedes the stack root: empty at a repository root,
+    `kapita/` from a workspace root, an absolute directory otherwise. Commands
+    are built from it so they work whatever directory the session started in.
+    """
+    parts = path.replace("\\", "/").split("/")
+    for index, part in enumerate(parts[:-1]):
+        if part != root:
+            continue
+        prefix = "/".join(parts[:index]) + "/" if index else ""
+        target = build(prefix, "/".join(parts[index + 1 :]))
+        if target is not None:
+            return target
+    return None
+
+
+def _backend_target(prefix: str, rel: str) -> LintTarget | None:
+    if not rel.endswith(".py"):
         return None
 
-    rel = norm[len("backend/") :]
+    backend = f"{prefix}backend"
     parts = rel.split("/")
-    if not parts:
-        return None
 
     if parts[0] == "scripts":
-        script = "/".join(parts)
         return LintTarget(
             stack="backend",
-            key="backend-scripts",
+            key=f"{prefix}backend-scripts",
             label="backend scripts",
             package=".",
-            cmd=f"cd backend && poetry run ruff check {script}",
+            cmd=f"cd {backend} && poetry run ruff check {rel}",
             extra="Also run mypy when the script is type-checked in CI.",
         )
 
@@ -62,80 +78,79 @@ def resolve_backend_lint_target(path: str) -> LintTarget | None:
         mypy = _mypy_module(package_path.rsplit("/", maxsplit=1)[-1])
         return LintTarget(
             stack="backend",
-            key=package_path,
+            key=f"{prefix}{package_path}",
             label=package_path.rsplit("/", maxsplit=1)[-1],
             package=package_path,
-            cmd=(
-                f"make -C backend lint-package PACKAGE={package_path} MYPY_PACKAGE={mypy}"
-            ),
+            cmd=f"make -C {backend} lint-package PACKAGE={package_path} MYPY_PACKAGE={mypy}",
             extra=(
                 "Fix all ruff and mypy errors. Safe auto-fix: "
-                "`make -C backend lint-fix` then re-run package lint."
+                f"`make -C {backend} lint-fix` then re-run package lint."
             ),
         )
 
     if len(parts) == 1 or parts[0] in {"make", "tools"}:
         return LintTarget(
             stack="backend",
-            key="backend-root",
+            key=f"{prefix}backend-root",
             label="backend root",
             package=".",
-            cmd="cd backend && poetry run ruff check .",
+            cmd=f"cd {backend} && poetry run ruff check .",
         )
 
     return None
 
 
-def resolve_web_lint_target(path: str) -> LintTarget | None:
-    norm = path.replace("\\", "/")
-    if not norm.startswith("frontend-web/"):
+def _web_target(prefix: str, rel: str) -> LintTarget | None:
+    if Path(rel).suffix.lower() not in {".ts", ".tsx", ".css", ".mts"}:
         return None
 
-    suffix = Path(norm).suffix.lower()
-    if suffix not in {".ts", ".tsx", ".css", ".mts"}:
-        return None
-
-    rel = norm[len("frontend-web/") :]
-    parts = rel.split("/")
-    package_path = _monorepo_package(parts)
+    package_path = _monorepo_package(rel.split("/"))
     if package_path is None:
         return None
 
-    label = package_path.rsplit("/", maxsplit=1)[-1]
+    web = f"{prefix}frontend-web"
     return LintTarget(
         stack="web",
-        key=package_path,
-        label=label,
+        key=f"{prefix}{package_path}",
+        label=package_path.rsplit("/", maxsplit=1)[-1],
         package=package_path,
-        cmd=f"make -C frontend-web lint-package PACKAGE={package_path}",
+        cmd=f"make -C {web} lint-package PACKAGE={package_path}",
         extra=(
             "For TypeScript errors, also run "
-            f"`cd frontend-web/{package_path} && pnpm run type-check` "
+            f"`cd {web}/{package_path} && pnpm run type-check` "
             "when available. Tailwind `@apply` errors surface in app build "
             "(`pnpm run build` under the consuming app)."
         ),
     )
 
 
-def resolve_mobile_lint_target(path: str) -> LintTarget | None:
-    norm = path.replace("\\", "/")
-    if not norm.startswith("frontend-mobile/") or not norm.endswith(".dart"):
+def _mobile_target(prefix: str, rel: str) -> LintTarget | None:
+    if not rel.endswith(".dart"):
         return None
 
-    rel = norm[len("frontend-mobile/") :]
-    parts = rel.split("/")
-    package_path = _monorepo_package(parts)
+    package_path = _monorepo_package(rel.split("/"))
     if package_path is None:
         return None
 
-    label = package_path.rsplit("/", maxsplit=1)[-1]
     return LintTarget(
         stack="mobile",
-        key=package_path,
-        label=label,
+        key=f"{prefix}{package_path}",
+        label=package_path.rsplit("/", maxsplit=1)[-1],
         package=package_path,
-        cmd=f"make -C frontend-mobile lint-package PACKAGE={package_path}",
+        cmd=f"make -C {prefix}frontend-mobile lint-package PACKAGE={package_path}",
     )
+
+
+def resolve_backend_lint_target(path: str) -> LintTarget | None:
+    return _first_target(path, "backend", _backend_target)
+
+
+def resolve_web_lint_target(path: str) -> LintTarget | None:
+    return _first_target(path, "frontend-web", _web_target)
+
+
+def resolve_mobile_lint_target(path: str) -> LintTarget | None:
+    return _first_target(path, "frontend-mobile", _mobile_target)
 
 
 def resolve_lint_target(path: str) -> LintTarget | None:
