@@ -19,7 +19,7 @@
 ## Conventions
 
 - **Pages** in Figma = flow groups (e.g. `Onboarding`, `Checkout`); **frames** = routes, named `<route-or-screen> / <breakpoint>` (`Dashboard / desktop`, `Dashboard / mobile`).
-- **Variables** mirror code tokens (colors, spacing, radius, typography Inter / Fira Code); light and dark modes. Never hardcode hex values in mockups.
+- **Variables** mirror code tokens (colors, spacing, radius, typography); light and dark modes. Never hardcode hex values in mockups.
 - **Components** mirror `core-ui` names (`PageHeader`, `GlassCard`, `CardSection`, `PanelSection`, `Button`, `StatusBadge`); variants map to props.
 - Honour the brand values and interaction rules in `design-system.md` (hover rules, WCAG 2.1 AA).
 
