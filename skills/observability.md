@@ -44,7 +44,7 @@ Parallel telemetry:
 - Events carry **non-PII** context only: `platform`, `path` or `screen`, `method`, `status_code`, `duration_ms`, and `client_request_id` once propagated.
 - Analytics is **first-party only**: no third-party analytics SDK or service.
 - Consent is opt-in; unknown or denied consent sends nothing. Autocapture and session replay are masked by construction and behind kill-switch flags; never add a way to record unmasked content.
-- Tube side (ingest, allow-list, retention, rollups, replay, tokens): `shipdeck-analytics-tube-skills.md` in the Shipdeck layer.
+- Tube side (ingest, allow-list, retention, rollups, replay, tokens): `enabler-analytics-tube-skills.md` in the Enabler layer.
 
 ## Implementation checklist (new features)
 

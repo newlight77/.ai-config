@@ -16,7 +16,7 @@ Shared workflow for AI coding assistants (Cursor, Claude Code, and similar) in e
 
 1. **Inspect first** — No speculation; explore repo before making claims
 2. **Plan non-trivial work** — Use Plan mode for 3+ steps or multi-file changes
-3. **Read relevant skills** — Consult `.ai-config/skills/generic-skills.md`, then the index of the repository you work in (`kapita/.ai-config/skills/kapita-skills.md` or `shipdeck/.ai-config/skills/shipdeck-skills.md`); load the skill file for your task type
+3. **Read relevant skills** — Consult `.ai-config/skills/generic-skills.md`, then the index of the repository you work in (`kapita/.ai-config/skills/kapita-skills.md` `shipdeck/.ai-config/skills/shipdeck-skills.md` or `shipdeck-enabler/.ai-config/skills/enabler-skills.md`); load the skill file for your task type
 
 ## During Implementation
 

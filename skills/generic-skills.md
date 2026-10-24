@@ -1,6 +1,6 @@
 # Generic Skills Index
 
-**When to use:** Pick the relevant skill file for your task. These skills are project-neutral engineering practice shared by every repository of the workspace. Product skills are indexed in `kapita/.ai-config/skills/kapita-skills.md`; tool and platform skills in `shipdeck/.ai-config/skills/shipdeck-skills.md`.
+**When to use:** Pick the relevant skill file for your task. These skills are project-neutral engineering practice shared by every repository of the workspace. Product skills are indexed in `kapita/.ai-config/skills/kapita-skills.md`; tool and platform skills in `shipdeck/.ai-config/skills/shipdeck-skills.md`; build-site and enabler-tube skills in `shipdeck-enabler/.ai-config/skills/enabler-skills.md`.
 
 ## Hierarchy
 
