@@ -2,7 +2,7 @@
 
 **When to use:** Adding/updating tests, coverage, Robot Framework, CI test workflows.
 
-**Entry point:** the workspace `AGENTS.md`. Strategy source of truth: the project's `docs/testing/Testing-Strategy.md` (see [`canonical.md`](../canonical.md)). **Coverage gates:** the project's `docs/testing/Coverage-Thresholds.md` (per-platform per-type minimums, lcov filters, `COVERAGE_ENFORCE`). Project-specific suites and scenario catalogs live in the project's own testing skill (Kapita: `kapita-testing.md`). Tool-side testing (functional-test catalog, stages): see the Enabler test tube skill (`enabler-test-tube-skills.md`).
+**Entry point:** the workspace `AGENTS.md`. Strategy source of truth: the project's `docs/testing/Testing-Strategy.md` (see [`canonical.md`](../canonical.md)). **Coverage gates:** the project's `docs/testing/Coverage-Thresholds.md` (per-platform per-type minimums, lcov filters, `COVERAGE_ENFORCE`). Project-specific suites and scenario catalogs live in the project's own testing skill (Kapita: `kapita-testing.md`). Tool-side testing (functional-test catalog, stages): see the Shipdeck test tube skill (`enabler-test-tube-skills.md`).
 
 ## Strategy
 
