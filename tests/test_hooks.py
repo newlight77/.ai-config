@@ -110,5 +110,19 @@ class ClaudeAdapterTest(unittest.TestCase):
         self.assertEqual(Path(out["additionalContext"]).resolve(), Path(session).resolve())
 
 
+class SessionContextTest(unittest.TestCase):
+    def test_injects_the_generic_policy_text(self) -> None:
+        result = subprocess.run(
+            [sys.executable, str(HOOKS / "session-context.py")],
+            input="{}",
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        text = json.loads(result.stdout)["additional_context"]
+        self.assertIn("Generic agent constraints", text)
+        self.assertIn("type(domain/context)/area: imperative summary", text)
+
+
 if __name__ == "__main__":
     unittest.main()
