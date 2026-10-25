@@ -32,4 +32,4 @@
 | Docs, API contracts, Robot E2E doc touchpoints | `documentation.md` |
 | **Evidence Template**, commit readiness, commit message shape | `evidence.md` |
 | Kubernetes / k3s as code (kubectl, Sealed Secrets, Helm, Argo CD, Ansible) | `kubernetes-cluster.md` (concrete environment: `shipdeck-infra-skills.md`) |
-| **Deep bug-finding** (explicit user request; scan recent commits for critical bugs) | `bug-finding.md` (+ `.ai-config/bug-finding-memories.md`) |
+| **Deep bug-finding** (explicit user request; scan recent commits for critical bugs) | `bug-finding.md` |

@@ -6,9 +6,8 @@
 
 ## Before you start
 
-1. Read **`.ai-config/bug-finding-memories.md`** — tracks bugs already reported across runs (one-line description, location/root cause, PR or commit link, status, date). **Do not** re-investigate or re-fix a bug that already has an **open** PR listed there.
-2. Determine scope from the user (default: commits on the current branch since `origin/main`, or the last ~10 commits if no base is given).
-3. Read the project's rules file (`.ai-config/rules/generic-rules.md` plus the repository's own rules), `.ai-config/skills/architecture.md`, and `.ai-config/skills/testing.md` when fixes touch production code.
+1. Determine scope from the user (default: commits on the current branch since `origin/main`, or the last ~10 commits if no base is given).
+2. Read the project's rules file (`.ai-config/rules/generic-rules.md` plus the repository's own rules), `.ai-config/skills/architecture.md`, and `.ai-config/skills/testing.md` when fixes touch production code.
 
 ## Investigation strategy
 
@@ -30,21 +29,6 @@
 - Run targeted validation; record commands in the summary (see `.ai-config/skills/evidence.md`).
 - **Avoid broad refactors** in the same change.
 - **Do not commit or open a PR** unless the user asks — propose the fix and wait for approval.
-
-## Avoiding duplicate work
-
-For each finding that matches an entry in `.ai-config/bug-finding-memories.md`, check status:
-
-| Status | Action |
-|--------|--------|
-| **open** | Do not open another PR. Note in the summary that a fix is still awaiting review; link the existing PR. |
-| **merged** | Delete the entry — bug is fixed. |
-| **rejected** | Keep entry; set status to `rejected`. Do not re-open unless the relevant code **materially changed** since. |
-| **fixed elsewhere** | Delete the entry. |
-
-Also delete **rejected** entries older than **30 days** — after that drift, the bug may warrant a fresh look.
-
-Keep `.ai-config/bug-finding-memories.md` **small**: only open or rejected items with date recorded. Do not log run history or scan notes there.
 
 ## Safety rules
 
@@ -68,8 +52,6 @@ Keep `.ai-config/bug-finding-memories.md` **small**: only open or rejected items
 ### Fix and validation
 [Change summary; tests added; commands run and results]
 
-### Memory update
-[Whether `.ai-config/bug-finding-memories.md` was updated]
 ```
 
 ### When no critical bug is found
@@ -84,13 +66,3 @@ Keep `.ai-config/bug-finding-memories.md` **small**: only open or rejected items
 **Notable non-critical observations:** [optional, brief — or omit]
 ```
 
-## After opening a PR (user-requested only)
-
-Before finishing, append to `.ai-config/bug-finding-memories.md`:
-
-- Date (ISO)
-- One line: location + root cause
-- PR URL
-- Status: `open`
-
-Apply any pending cleanup from the table above in the same edit.

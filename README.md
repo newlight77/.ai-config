@@ -17,7 +17,6 @@ Rule of thumb: if it would still be true for a project that is not Kapita and is
 ├── rules/generic-rules.md        mandatory rules (numbering kept from the original rules file)
 ├── workflow.md                   Ask → Plan → Agent, evidence, checkpoints, definition of done
 ├── canonical.md                  conflict resolution order across the layers
-├── bug-finding-memories.md       memory table for the deep bug-finding skill
 ├── skills/                       generic-skills.md (index) + one file per topic
 ├── hooks/                        session-context, lint tracking, reminders, Claude adapter
 └── tests/                        unittest coverage of the hooks
