@@ -6,7 +6,7 @@
 
 When adding utilities under `scripts/`, **prefer Python** (`python3 scripts/<name>.py`) over new Bash scripts. Shell is fine for thin Makefile glue, required executable hooks, or documented legacy helpers — see `.ai-config/skills/scripts.md`.
 
-Composer reminds agents via `post-tool-python-scripts-reminder.py` when a new `scripts/*.sh` file is written.
+Composer reminds agents via `post-tool.py` when a new `scripts/*.sh` file is written.
 
 ## Non-interactive copy (macOS)
 

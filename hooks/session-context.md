@@ -1,85 +1,45 @@
 # Generic agent constraints (from `.ai-config` rules, skills, workflow)
 
-This block is injected at **session start** by the hooks registered at the workspace root (`.cursor/hooks.json`, `.claude/settings.json`) so agent runs align with policy. It **does not replace** reading the workspace `AGENTS.md`, the skill files, or the project's `docs/architecture/` / `docs/testing/Testing-Strategy.md` — see `.ai-config/canonical.md` if anything conflicts. The repository you work in adds its own session text (product: Kapita policy; tools and platform: Shipdeck rules).
+Injected at **session start** by the hooks registered at the workspace root (`.cursor/hooks.json`, `.claude/settings.json`). This is the slim core: the implementation constraints (hexagonal layout, test shapes, Robot, lint, observability) are in `session-context-impl.md` and arrive with the first prompt that looks like code work. It **does not replace** the workspace `AGENTS.md`, the skill files or `docs/architecture/`; see `.ai-config/canonical.md` on conflict. Each repository adds its own session text (product: Kapita policy; tools and platform: Shipdeck rules).
 
-**Read order (summary):** workspace `AGENTS.md` → `.ai-config/rules/generic-rules.md` → the rules of the repository you work in → `.ai-config/workflow.md` → `.ai-config/skills/generic-skills.md` and that repository's skills index (pick skills) → `.ai-config/canonical.md` for disputes.
+**Read order:** workspace `AGENTS.md` → `.ai-config/rules/generic-rules.md` → rules of the repository you work in → `.ai-config/workflow.md` → skill indexes (`.ai-config/skills/generic-skills.md` + the repository's; match the **Triggers** column to the prompt, read only the matching skill file) → `.ai-config/canonical.md` for disputes.
 
 ## Workflow
 
 - **Ask** → explore and answer (read-only). **Plan** → non-trivial work, unclear scope, architecture choices. **Agent** → implement after the plan is clear.
-- **Inspect the repo** before claiming behavior; avoid speculation.
-- **Minimal diffs**; no unrelated refactors.
-- **Fail-safe:** if constraints cannot be met, stop and ask for guidance.
+- **Inspect the repo** before claiming behavior; **minimal diffs**; no unrelated refactors.
+- **Fail-safe:** if constraints cannot be met, stop and ask.
 
-## Agent shell commands
+## Delegate to keep the main context small
 
-- **Forced copy on macOS:** use `/bin/cp -f` (not `cp -f`) so `cp -i` aliases do not prompt `overwrite …? (y/n)` — agent terminals cannot accept interactive input. See `.ai-config/skills/shell.md`.
+- **Inline:** edits, short questions, sequential dependent steps, anything you will need the raw output of again.
+- **`Explore` agent:** locating files, symbols or usages ("where is X defined", "who calls Y"); give a breadth (quick / medium / thorough).
+- **Fork / general-purpose agent:** open-ended research, surveys across many files, log or test-output triage, independent sub-questions (launch them in parallel). Ask for a short, structured report.
+- **`Plan` agent:** design of non-trivial changes before you edit.
+- Never delegate understanding: brief agents with paths, symptoms and what you already ruled out.
 
-## Repo scripts (Python-first)
+## Shell and scripts
 
-- **New utilities under `scripts/`:** prefer **Python** (`python3 scripts/<name>.py`); add `scripts/tests/test_<name>.py` for non-trivial logic; update `scripts/README.md`.
-- **Make timing:** `test` / `test-*`, `format` / `format-*`, `lint` / `lint-*` targets print durations through the project's make timing helper (see `.ai-config/skills/scripts.md`).
-- **Shell exceptions:** thin Makefile glue, required executable hooks, legacy helpers.
+- **macOS copy:** use `/bin/cp -f` (not `cp -f`); agent terminals cannot answer `cp -i` prompts (`.ai-config/skills/shell.md`).
+- **New utilities under `scripts/`:** Python (`python3 scripts/<name>.py`), with `scripts/tests/test_<name>.py` and `scripts/README.md` updated; shell only for thin Makefile glue, executable hooks, legacy helpers (`.ai-config/skills/scripts.md`).
+- Use existing Makefile targets; never invent new ones.
 
-## Hexagonal architecture (new context / vertical slice)
+## Before commit
 
-- **Isolate the domain**; adapters implement **ports**; dependencies point **inward**.
-- **No cross-context imports** of domain core.
-- **New context:** replicate the hex layout (`domain/`, `driver/`, `driven/`, `presentation/`, `tests/` as in `.ai-config/skills/architecture.md` and `docs/architecture/`).
-- **New web context / app package:** also scaffold `vitest.config.mts` (not `.ts`), `test/setup.ts`, and `test/support/test-router.tsx` when UI/feature/sanity tests render routed components — use `TestMemoryRouter` / `TestBrowserRouter`, not raw routers (see `.ai-config/skills/testing.md` § *Web frontend Vitest conventions*).
-- **Ports first**, adapters second; wire dependencies only at **composition roots**.
-- **Frontend atomic hexagonal placement:** feature objects/views/pages stay in the owning domain or capability context; generic reusable atomic UI belongs in `core-ui`. Split large pages/components into focused components, hooks, or helpers before adding more behavior.
-
-## Testing strategy (mandatory shapes)
-
-- **Unit tests** — only **configuration**, **driver** (inbound) adapters, and **driven** (outbound) adapters. Paths **mirror `src`** under `tests/unit/` (or package-local `test/unit/`). **No** unit tests whose subject is domain entities, value objects, domain services, ports as types only, or use case classes in isolation.
-- **Use case tests** — invoke the **real use case** class with **all ports** faked or mocked; assert domain rules and orchestration. **Do not** “move” domain unit tests into the use-case suite. For **corner cases / domain coverage**, add **more use case tests**, not domain service unit tests.
-- **Feature tests** — **cross-hexagon** flow within a bounded context (e.g. `tests/feature/` with real DB or HTTP stack **as defined per package**). On **frontend**, feature-level tests also cover **component** / page behavior where that package’s conventions apply.
-- Add **appropriate** tests per change (unit / use case / feature / UI / sanity / Robot E2E as applicable).
-
-## Robot Framework E2E (`testing/e2e/backend/`)
-
-- In **Test Cases**, **`[Documentation]`**, and **keywords invoked from test cases**: use **business / product language** only (actors, outcomes, product terms). **Do not** use URLs, HTTP status codes, header names, JSON field names, OpenAPI/BFF/wire-format jargon in those places.
-- **Technical** HTTP, paths, JSON keys, and low-level checks belong in **`libraries/ApiLibrary.py`** and in the **bodies** of resource keywords — not in the test-case layer.
-- Prefer **one resource file per domain context** (e.g. `<context>.robot`). Update the project's test scenarios document when adding scenarios (see `testing/README.md`).
-
-## Evidence and quality (before commit)
-
-- Use the **Evidence Template** (`.ai-config/skills/evidence.md`): requirement, scope, design, implementation, **tests**, validation commands, risks, rollback.
-- **Backend lint (before finishing edits):** after changing backend `.py` (src, tests, or `scripts/`), run `make -C backend lint-package PACKAGE=… MYPY_PACKAGE=…` (or root `poetry run ruff check` for scripts) and fix all ruff/mypy errors **before ending the agent turn**.
-- **Web lint (before finishing edits):** after changing frontend-web `.ts`/`.tsx`/`.css` or tests, run `make -C frontend-web lint-package PACKAGE=…`, fix eslint; run `pnpm run type-check` when TS changed; verify app `pnpm run build` when Tailwind `@apply` CSS changed.
-- **Mobile lint (before finishing edits):** after changing frontend-mobile `.dart`, run `make -C frontend-mobile lint-package PACKAGE=…` and fix all `flutter analyze` issues.
-- Hooks (**postToolUse** / **stop**) track touched packages across all three stacks, in any repository of the workspace, and list commands. Full checklists: `.ai-config/skills/backend.md`, `web.md`, `mobile.md` § Lint before finishing.
-- **Checkpoints** (use existing Makefile targets from repo / package): `make build`, `make test-unit`, `make test-use-case`, `make test-feature`, `make test-sanity`, functional E2E from `testing/` where relevant, `make format`, `make lint`, `make test-regression`.
+Evidence Template (`.ai-config/skills/evidence.md`), then the checkpoints from the repository you changed: `make build`, `make test-*`, `make format`, `make lint`, `make test-regression`. Lint reminders for touched packages come from the post-tool and stop hooks.
 
 ## Commit messages (Conventional Commits + domain scope)
 
-Use **[Conventional Commits](https://www.conventionalcommits.org/)** types (`feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `chore`, `ci`, `build`, …). **Subject line (≤ ~72 chars):**
+Subject (≤ ~72 chars): `type(domain/context)/area: imperative summary`
 
-`type(domain/context)/area: imperative summary`
+- **`type`:** `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `chore`, `ci`, `build`, …
+- **`(domain/context)`:** bounded domain or slice, slash-separated when nested (e.g. `orders/checkout`).
+- **`/area`:** where the change lands; the set is defined by the repository's session text (Kapita: `backend`, `web`, `mobile`, `testing`, `docs`, `cursor`).
+- Short imperative summary, no trailing period. After a blank line, a body: what, why, risk/rollback.
+- One small atomic commit per repository and per step. Never push, amend published commits or skip hooks unless asked.
+- `docs`-only commits may use `docs(domain/context): …`.
 
-- **`type`:** conventional verb (what changed).
-- **`(domain/context)`:** bounded domain or slice, slash-separated when nested (e.g. `orders/checkout`). Mirrors product/architecture language.
-- **`/area`:** where the change lands. The set of areas is **defined by the project** (Kapita: `backend`, `web`, `mobile`, `testing`, `docs`, `cursor`; the repository's own session text lists its set).
-- **`:`** then a **short imperative summary** (no trailing period).
-
-**Body:** After a blank line, add a **description** (bullets or short paragraphs): what changed, why, risk/rollback pointers — aligned with the Evidence Template when possible.
-
-**Granularity:** one small, atomic commit per repository and per step. Never push, amend published commits, or skip hooks unless asked.
-
-**Uniform `docs` commits:** Prefer `docs(domain/context)/docs: …` for consistency. The shorter `docs(domain/context): …` form is acceptable when the commit is **only** documentation under `docs/` and the type already signals doc-only scope.
-
-**Examples:**
-
-- `docs(orders/checkout): update checkout docs and testing scenarios`
-- `test(orders/checkout)/testing: add refund scenarios and robot helpers`
-- `feat(orders/checkout)/mobile: add the refund screen + tests and API client forwarding`
-- `feat(orders/checkout)/web: add the refund form + tests`
-- `feat(orders/checkout)/backend: add the refund use case`
-
-## Observability
-
-- Propagate identity and debug context across clients and BFF (`.ai-config/skills/observability.md`); structured logs at boundaries; **no PII** in telemetry.
+Example: `feat(orders/checkout)/backend: add the refund use case`
 
 ## Canonical conflict order
 
@@ -87,5 +47,3 @@ Use **[Conventional Commits](https://www.conventionalcommits.org/)** types (`fea
 2. `.ai-config/skills/*.md` and the repository's skills
 3. `docs/architecture/1.atomic-hexagonal-architecture.md`
 4. `docs/testing/Testing-Strategy.md`
-
-Do **not** invent new Makefile command names; use existing targets.

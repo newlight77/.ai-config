@@ -6,6 +6,7 @@ Run from the .ai-config directory: python3 -m unittest discover -s tests
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -122,6 +123,61 @@ class SessionContextTest(unittest.TestCase):
         text = json.loads(result.stdout)["additional_context"]
         self.assertIn("Generic agent constraints", text)
         self.assertIn("type(domain/context)/area: imperative summary", text)
+
+    def test_core_is_slim_and_full_adds_implementation_text(self) -> None:
+        def run(*args: str) -> str:
+            result = subprocess.run(
+                [sys.executable, str(HOOKS / "session-context.py"), *args],
+                input="{}", capture_output=True, text=True, check=True,
+            )
+            return json.loads(result.stdout)["additional_context"]
+
+        core, full = run(), run("--full")
+        self.assertNotIn("Hexagonal architecture", core)
+        self.assertIn("Delegate", core)
+        self.assertIn("Hexagonal architecture", full)
+
+
+class PromptContextTest(unittest.TestCase):
+    def _run(self, prompt: str, session_id: str) -> dict:
+        result = subprocess.run(
+            [sys.executable, str(HOOKS / "prompt-context.py")],
+            input=json.dumps({"prompt": prompt, "session_id": session_id}),
+            capture_output=True, text=True, check=True,
+        )
+        return json.loads(result.stdout)
+
+    def test_ops_prompt_gets_nothing(self) -> None:
+        self.assertEqual(self._run("is production up to date?", "t-ops"), {})
+
+    def test_implementation_prompt_injects_once_per_session(self) -> None:
+        sid = f"t-impl-{os.getpid()}"
+        marker = Path(tempfile.gettempdir()) / f"ai-config-impl-{sid}"
+        marker.unlink(missing_ok=True)
+        try:
+            first = self._run("implement the refund use case", sid)
+            self.assertIn("Hexagonal architecture", first["additional_context"])
+            self.assertEqual(self._run("add another test", sid), {})
+        finally:
+            marker.unlink(missing_ok=True)
+
+
+class PostToolTest(unittest.TestCase):
+    def test_messages_per_file_type(self) -> None:
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location("post_tool", HOOKS / "post-tool.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+
+        def msgs(tool: str, path: str) -> list[str]:
+            return mod.build_messages({"tool_name": tool, "tool_input": {"file_path": path}})
+
+        self.assertTrue(any("Robot" in m for m in msgs("Write", "/r/kapita/testing/e2e/backend/a.robot")))
+        self.assertTrue(any("Frontend" in m for m in msgs("Write", "/r/kapita/frontend-web/x/a.tsx")))
+        self.assertTrue(any("Python" in m or "python" in m for m in msgs("Write", "/r/kapita/scripts/a.sh")))
+        self.assertEqual(msgs("Edit", "/r/kapita/testing/e2e/backend/a.robot"), [])
+        self.assertEqual(msgs("Write", "/r/kapita/docs/a.md"), [])
 
 
 if __name__ == "__main__":

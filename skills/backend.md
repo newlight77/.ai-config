@@ -36,7 +36,7 @@ After **any** backend Python change (production `src/`, tests, or `backend/scrip
    - Classic SQLAlchemy `Column()` models → `# type: ignore[arg-type]` / `[assignment]` when reading or assigning instance attributes in `_to_entity` (see the existing `_to_entity` mappers).
    - Optional internal deps in app `pyproject.toml` mypy overrides → add `your_context.*` to `[[tool.mypy.overrides]]` with `ignore_missing_imports = true` when needed.
 
-Composer hooks track touched packages (`.ai-config/hooks/post-tool-lint-track.py`) and the **stop** hook lists lint commands to run before declaring the task done.
+Composer hooks track touched packages (`.ai-config/hooks/post-tool.py`) and the **stop** hook lists lint commands to run before declaring the task done.
 
 ## Logging (JSON)
 

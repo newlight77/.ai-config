@@ -43,4 +43,4 @@ After **any** Dart change (`lib/`, `test/`, or app shell under `apps/`), **befor
 2. **Fix all `flutter analyze` issues** reported for that package (unused imports, type errors, deprecated APIs).
 3. **Format** when needed: `make -C frontend-mobile format-package PACKAGE=…` (or workspace `make format` before commit).
 
-Composer hooks track touched packages (`.ai-config/hooks/post-tool-lint-track.py`); the **stop** hook lists commands for backend, web, and mobile edits this session.
+Composer hooks track touched packages (`.ai-config/hooks/post-tool.py`); the **stop** hook lists commands for backend, web, and mobile edits this session.

@@ -34,5 +34,5 @@ The documentation bundle, architecture map and releases timeline are the referen
 
 ## Agent reminders
 
-- The **postToolUse** hook nudges toward Python when a new `scripts/*.sh` file is created (`.ai-config/hooks/post-tool-python-scripts-reminder.py`).
+- The **postToolUse** hook nudges toward Python when a new `scripts/*.sh` file is created (`.ai-config/hooks/post-tool.py`).
 - Non-interactive terminal rules remain in `.ai-config/skills/shell.md` (`/bin/cp -f`, no interactive prompts).

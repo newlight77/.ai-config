@@ -37,4 +37,4 @@ After **any** web change (`src/`, `test/`, or package CSS under `presentation/st
 3. **Tailwind `@apply` in CSS:** invalid utility classes fail at **Vite build** — use Tailwind tokens from `tailwind.config.js` (e.g. `text-text-secondary`, `text-warning-main`), not compat-only classes like `text-<project>-warning` / `text-<project>-muted`. Verify with `pnpm run build` on the consuming app when CSS changed.
 4. **Fix all eslint / type-check / build errors** before finishing — do not defer to CI.
 
-Composer hooks track touched packages (`.ai-config/hooks/post-tool-lint-track.py`); the **stop** hook lists commands for backend, web, and mobile edits this session.
+Composer hooks track touched packages (`.ai-config/hooks/post-tool.py`); the **stop** hook lists commands for backend, web, and mobile edits this session.
