@@ -1,90 +1,100 @@
 # Environment Files — Naming Convention
 
-**When to use:** Creating, locating, or documenting `.env` files for any backend service, BFF, or seed script across all namespaces and local development.
+**When to use:** Creating, locating, or documenting env files for any backend service, BFF, web frontend, or seed script across all namespaces and local development.
 
 ## Pattern
 
 ```
-.env[.<kind>][.<component>].<namespace>
+<kind>.<component>.<namespace>.env
 ```
 
 | Segment | Values | Notes |
 |---------|--------|-------|
-| `kind` | `bff`, `web`, `svc` | Omit for cross-cutting files (seeds, top-level app config) |
-| `component` | e.g. `app-backoffice`, `app-enabler`, `svc-product-tube` | Full app/service name prefixed with `app-` or `svc-`; omit only for namespace-wide files like seeds |
+| `kind` | `bff`, `web`, `svc`, `seed` | Type of the app or script |
+| `component` | e.g. `bff-backoffice`, `web-enabler`, `svc-product-tube`, `seed-kapita` | Full component name; prefix matches `kind` (`bff-*`, `web-*`, `svc-*`, `seed-*`) |
 | `namespace` | `dev`, `staging`, `prod`, `enabler`, `build`, `run`, `infra`, `cicd`, `platform`, `local`, `template` | `local` = developer machine; `template` = checked-in defaults with no secrets |
+
+Files **end** with `.env` — the kind is the first segment, not a file extension prefix.
 
 ## Single-instance tool namespaces
 
-The six tool namespaces — `enabler`, `build`, `run`, `infra`, `cicd`, `platform` — each deploy **one instance only** (no dev/staging copy). Every namespace runs exactly two apps:
-
-```
-app-<namespace>-bff   (the BFF)
-app-<namespace>-web   (the SPA)
-```
-
-The component is named `app-<namespace>` and the namespace is the same word, so the segment pair `.<component>.<namespace>` always contains the namespace name twice. Each app has two env files — one for the BFF and one for the web frontend:
-
-```
-.env.bff.app-enabler.enabler      ← BFF, deployed instance
-.env.web.app-enabler.enabler      ← SPA, deployed instance
-.env.bff.app-enabler.template     ← BFF template (no secrets), committed
-.env.web.app-enabler.template     ← SPA template (no secrets), committed
-.env.bff.app-enabler.local        ← BFF local override, not committed
-.env.web.app-enabler.local        ← SPA local override, not committed
-```
-
-The same pattern applies to all six namespaces:
+The six tool namespaces — `enabler`, `build`, `run`, `infra`, `cicd`, `platform` — each deploy **one instance only** (no dev/staging copy). The app names follow `app-<namespace>-bff` and `app-<namespace>-web`; `kind` = `namespace` in every case:
 
 | Namespace | BFF env file | Web env file |
 |-----------|-------------|-------------|
-| `enabler` | `.env.bff.app-enabler.enabler` | `.env.web.app-enabler.enabler` |
-| `build` | `.env.bff.app-build.build` | `.env.web.app-build.build` |
-| `run` | `.env.bff.app-run.run` | `.env.web.app-run.run` |
-| `infra` | `.env.bff.app-infra.infra` | `.env.web.app-infra.infra` |
-| `cicd` | `.env.bff.app-cicd.cicd` | `.env.web.app-cicd.cicd` |
-| `platform` | `.env.bff.app-platform.platform` | `.env.web.app-platform.platform` |
+| `enabler` | `bff.bff-enabler.enabler.env` | `web.web-enabler.enabler.env` |
+| `build` | `bff.bff-build.build.env` | `web.web-build.build.env` |
+| `run` | `bff.bff-run.run.env` | `web.web-run.run.env` |
+| `infra` | `bff.bff-infra.infra.env` | `web.web-infra.infra.env` |
+| `cicd` | `bff.bff-cicd.cicd.env` | `web.web-cicd.cicd.env` |
+| `platform` | `bff.bff-platform.platform.env` | `web.web-platform.platform.env` |
 
-## Product / multi-stage apps
-
-Apps that follow the product release cycle (`dev` → `staging` → `prod`) carry different env files per stage because the component name and namespace name differ:
-
+Each also has a `template` and optionally a `local` variant:
 ```
-.env.bff.backoffice.dev
-.env.bff.backoffice.staging
-.env.bff.backoffice.prod
-.env.bff.backoffice.template
-.env.bff.backoffice.local
+bff.bff-enabler.template.env
+bff.bff-enabler.local.env
+web.web-enabler.template.env
+web.web-enabler.local.env
 ```
 
-## Examples
+## Product / multi-stage apps (backoffice, main BFF, …)
 
-| File | What it configures |
-|------|--------------------|
-| `.env.bff.app-backoffice.dev` | Backoffice BFF — `dev` stage |
-| `.env.bff.app-backoffice.staging` | Backoffice BFF — `staging` stage |
-| `.env.bff.app-backoffice.prod` | Backoffice BFF — production stage |
-| `.env.bff.app-backoffice.template` | Backoffice BFF template (no real secrets) |
-| `.env.bff.app-backoffice.local` | Backoffice BFF local override, not committed |
-| `.env.bff.app-enabler.enabler` | Enabler BFF — single instance |
-| `.env.web.app-enabler.enabler` | Enabler SPA — single instance |
-| `.env.bff.app-enabler.template` | Enabler BFF template |
-| `.env.bff.app-build.build` | Build BFF — single instance |
-| `.env.bff.app-platform.platform` | Platform BFF — single instance |
-| `.env.svc.svc-product-tube.build` | Product Tube service in the `build` namespace |
-| `.env.svc.svc-product-tube.template` | Product Tube template |
-| `.env.seed.dev` | Seed script targeting `dev` |
-| `.env.seed.staging` | Seed script targeting `staging` |
-| `.env.seed.prod` | Seed script targeting production |
-| `.env.seed.local` | Seed script for local development database |
-| `.env.seed.template` | Seed template with no real credentials |
+Apps released through `dev → staging → prod` carry one file per stage:
+
+```
+bff.bff-backoffice.dev.env
+bff.bff-backoffice.staging.env
+bff.bff-backoffice.prod.env
+bff.bff-backoffice.template.env
+bff.bff-backoffice.local.env
+
+web.web-backoffice.dev.env
+web.web-backoffice.staging.env
+web.web-backoffice.prod.env
+web.web-backoffice.template.env
+web.web-backoffice.local.env
+```
+
+## Services (`svc-*`)
+
+A service deployed into one namespace:
+
+```
+svc.svc-product-tube.build.env
+svc.svc-product-tube.template.env
+```
+
+## Seeds
+
+Seeds are namespace-scoped, not app-scoped. The component name is `seed-<namespace>`:
+
+**Kapita product namespaces:**
+```
+seed.seed-kapita.dev.env
+seed.seed-kapita.staging.env
+seed.seed-kapita.prod.env
+seed.seed-kapita.local.env
+seed.seed-kapita.template.env
+
+seed.seed-enabler.enabler.env
+seed.seed-enabler.template.env
+```
+
+**Shipdeck tool namespaces** (one pair per namespace):
+```
+seed.seed-build.build.env       seed.seed-build.template.env
+seed.seed-run.run.env           seed.seed-run.template.env
+seed.seed-platform.platform.env seed.seed-platform.template.env
+seed.seed-cicd.cicd.env         seed.seed-cicd.template.env
+seed.seed-infra.infra.env       seed.seed-infra.template.env
+```
+
+A seed may target any single namespace: `enabler`, `build`, `run`, `infra`, `cicd`, `platform`, `dev`, `staging`, `prod`.
 
 ## Rules
 
-- **`template` files are committed**; all other files that contain real credentials are `.gitignore`d.
-- **`local` overrides `template`**: load `.env.<kind>.<component>.template` first, then `.env.<kind>.<component>.local` to override.
-- **No `kind` for seeds** — seeds operate across the whole stage, not a single service.
-- **Component name is the full app or service name** (e.g. `app-enabler-bff` → component `app-enabler`; `app-backoffice-bff` → component `app-backoffice`; `svc-product-tube` → component `svc-product-tube`). Use the `app-` or `svc-` prefix; drop only the `-bff` / `-web` suffix since `kind` already captures that.
-- **Namespace matches the cluster namespace** (`dev`, `staging`, `prod`, `enabler`, `build`, `run`, `infra`, `cicd`, `platform`). `prod` is the short form of `production` in file names.
+- **`template` files are committed**; all files containing real credentials are `.gitignore`d.
+- **`local` overrides `template`**: load `<kind>.<component>.template.env` first, then `<kind>.<component>.local.env` to override.
+- **Component prefix matches kind**: `bff-*` for BFF apps, `web-*` for SPAs, `svc-*` for services, `seed-*` for seed scripts.
+- **For tool namespaces, only `template` and `local` qualifiers exist alongside the namespace value** — there is no `dev`/`staging` variant because there is no dev/staging instance.
 - **One file per (kind, component, namespace) tuple** — never combine stages in one file.
-- **For tool namespaces, only `template` and `local` qualifiers make sense** alongside the namespace value — there is no separate dev/staging file because there is no dev/staging instance.
