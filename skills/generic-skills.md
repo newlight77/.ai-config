@@ -35,3 +35,4 @@
 | **Evidence Template**, commit readiness, commit message shape | evidence, commit, commit message, ready to commit | `evidence.md` |
 | Kubernetes / k3s as code (kubectl, Sealed Secrets, Helm, Argo CD, Ansible) | kubectl, k3s, helm, argo, sealed secret, ansible | `kubernetes-cluster.md` (concrete environment: `shipdeck-infra-skills.md`) |
 | **Deep bug-finding** (explicit user request; scan recent commits for critical bugs) | find bugs, critical bugs, scan commits, audit | `bug-finding.md` |
+| **Environment files** (`.env` naming convention, kind/component/namespace segments, template vs local, gitignore rules) | .env, env file, env naming, dotenv, template env, local env | `env-files.md` |
