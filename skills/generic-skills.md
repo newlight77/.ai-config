@@ -36,3 +36,4 @@
 | Kubernetes / k3s as code (kubectl, Sealed Secrets, Helm, Argo CD, Ansible) | kubectl, k3s, helm, argo, sealed secret, ansible | `kubernetes-cluster.md` (concrete environment: `shipdeck-infra-skills.md`) |
 | **Deep bug-finding** (explicit user request; scan recent commits for critical bugs) | find bugs, critical bugs, scan commits, audit | `bug-finding.md` |
 | **Environment files** (`.env` naming convention, kind/component/namespace segments, template vs local, gitignore rules) | .env, env file, env naming, dotenv, template env, local env | `env-files.md` |
+| **Makefile conventions** (normalized target groups: install, build, run, test, seed, format, lint, migrate, docker, clean; per-component and PACKAGE= patterns) | makefile, make target, install, build, run, test, seed, format, lint, migrate, docker, clean | `makefile.md` |
