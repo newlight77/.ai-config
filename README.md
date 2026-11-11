@@ -6,7 +6,7 @@ Project-neutral rules, skills, hooks and workflow for AI coding assistants (Curs
 |-------|------------|-------|
 | **Generic** | `.ai-config` (this one) | methods (triple-loop SDD, DDD, BDD, TDD), coding practice, commit convention, architecture, design system, testing, observability, scripts, Kubernetes practice, hooks |
 | **Product** | `kapita/.ai-config` | personas, use cases, user flows, vision, strategy, requirements, brand and design-system specifics (`kapita-*`) |
-| **Shipdeck** | `shipdeck/.ai-config` | run, platform, cicd, infra: stage, IAM, source of truth, the release, documentation, spec and product tubes, the build site and its enabler tubes (feature, eligibility, test, analytics, challenges, notifications, design-system pages), the concrete cluster (`shipdeck-*`, `enabler-*`) |
+| **Shipdeck** | `shipdeck/.ai-config` | run, platform, cicd, infra: stage, IAM, source of truth, the release, documentation, spec and product tubes, the concrete cluster (`shipdeck-*`); the enabler skills (`enabler-*`) are Kapita's, in `kapita-v2/.ai-config` |
 
 Rule of thumb: if it would still be true for a project that is not Kapita and is not Shipdeck, it belongs here.
 
@@ -30,7 +30,7 @@ The lint hooks accept repository-relative, workspace-relative (`kapita/backend/.
 
 ## Naming
 
-Generic files are unprefixed (`architecture.md`). Product files are `kapita-*`, Shipdeck files are `shipdeck-*` (its build-site add-on uses `enabler-*`). A skill that exists in two layers keeps the method here and the project specifics in the layer, with a one-line pointer from here to there.
+Generic files are unprefixed (`architecture.md`). Product files are `kapita-*`, Shipdeck files are `shipdeck-*` (the enabler add-on `enabler-*` lives in the Kapita layer). A skill that exists in two layers keeps the method here and the project specifics in the layer, with a one-line pointer from here to there.
 
 ## Tests
 
