@@ -9,6 +9,7 @@ Injected at **session start** by the hooks registered at the workspace root (`.c
 - **Ask** → explore and answer (read-only). **Plan** → non-trivial work, unclear scope, architecture choices. **Agent** → implement after the plan is clear.
 - **Inspect the repo** before claiming behavior; **minimal diffs**; no unrelated refactors.
 - **Fail-safe:** if constraints cannot be met, stop and ask.
+- **Say what the user has to do or decide:** end each report with explicit **You do** / **You decide** items (what, where, options with a recommendation, what waiting costs); never leave them implied or buried (`rules/generic-rules.md` rule 23).
 
 ## Delegate to keep the main context small
 

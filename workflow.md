@@ -34,6 +34,7 @@ Shared workflow for AI coding assistants (Cursor, Claude Code, and similar) in e
 - **Checkpoints** — Run `make build`, `make test-*`, `make format`, `make lint`, `make test-regression`
 - **Robot E2E** — When adding or changing `testing/e2e/backend/*.robot`, follow `.ai-config/skills/testing.md`: business vocabulary in test cases and scenario docs; technical terms only in libraries and resource keyword implementations.
 - **Fail-safe** — If constraints cannot be met, stop and ask for guidance
+- **You do / You decide** — Reports and plans label what only the user can do and what the user must decide, with the options and a recommendation (generic rule 23)
 
 ## Definition of Done
 
